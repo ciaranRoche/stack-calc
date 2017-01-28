@@ -14,8 +14,6 @@ public class CalcEngine
     public Stack<Integer> memory;
     public Stack<Character>stack;
 
-
-
     public String ans;
     /**
      * Create a CalcEngine instance. Initialise its state so that it is ready
@@ -58,6 +56,11 @@ public class CalcEngine
                         int ad = memory.pop();
                         memory.push(ad/bd);
                         break;
+                    case '^':
+                        int bp = memory.pop();
+                        int ap = memory.peek();
+                        memory.push((int) Math.pow(ap, bp));
+                        break;
                 }
             }
         }
@@ -67,6 +70,7 @@ public class CalcEngine
     public String infixToPostfix(String s){
         for(int i = 0; i< s.length(); i++){
             char ch = s.charAt(i);
+         //   if('0'<=ch && ch>='9')
             switch (ch){
                 case '+':
                 case '-':
@@ -75,6 +79,9 @@ public class CalcEngine
                 case '*':
                 case '/':
                     operator(ch, 2);
+                    break;
+                case '^':
+                    operator(ch, 3);
                     break;
                 case '(':
                     stack.push(ch);
@@ -96,6 +103,9 @@ public class CalcEngine
 
     }
 
+    private void power(char ch) {
+    }
+
     public void operator(char opThis, int prec1){
         while(!stack.isEmpty()){
             char topStack = stack.pop();
@@ -105,6 +115,10 @@ public class CalcEngine
             }else{
                 int prec2;
                 if(topStack == '+' || topStack == '-')
+                    prec2 = 1;
+                else
+                    prec2 = 2;
+                if(topStack == '*' || topStack == '/')
                     prec2 = 1;
                 else
                     prec2 = 2;
