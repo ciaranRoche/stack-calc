@@ -13,16 +13,18 @@ public class CalcEngine
     public String output;
     public Stack<Integer> memory;
     public Stack<Character>stack;
-
+  //public Stack<Character> postfix;
     public String ans;
+    int temp;
     /**
      * Create a CalcEngine instance. Initialise its state so that it is ready
      * for use.
      */
     public CalcEngine()
     {
-        stack = new Stack<Character>();
-        memory = new Stack<Integer>();
+        stack = new Stack<>();
+        memory = new Stack<>();
+       // postfix = new Stack<Character>();
         output = "";
         ans = "";
     }
@@ -31,11 +33,16 @@ public class CalcEngine
         memory.clear();
         ans = "";
         for(int n=0; n<output.length(); n++){
-            int ch = output.charAt(n);
-            if('0'<=ch && ch<='9')
-                memory.push(ch - '0');
+            int in = output.charAt(n);
+            if(('0'<=in && in<='9')||('.'==in)){
+                temp += in;
+            }
+            else if(' ' == in){
+                memory.push(temp-'0');
+                temp = 0;
+            }
             else{
-                switch(ch){
+                switch(in){
                     case '+':
                         int ba = memory.pop();
                         int aa = memory.pop();
@@ -69,33 +76,43 @@ public class CalcEngine
 
     public String infixToPostfix(String s){
         for(int i = 0; i< s.length(); i++){
-            char ch = s.charAt(i);
-         //   if('0'<=ch && ch>='9')
-            switch (ch){
+            char in = s.charAt(i);
+            if((!Character.isDigit(in)) && (in!='.')){
+                char filler = ' ';
+                output = output + filler;
+            }
+            switch (in){
                 case '+':
                 case '-':
-                    operator(ch, 1);
+                    operator(in, 1);
                     break;
                 case '*':
                 case '/':
-                    operator(ch, 2);
+                    operator(in, 2);
                     break;
                 case '^':
-                    operator(ch, 3);
+                    operator(in, 3);
                     break;
                 case '(':
-                    stack.push(ch);
+                    stack.push(in);
                     break;
                 case ')':
-                    priority(ch);
+                    while(!stack.isEmpty()){
+                        char per = stack.pop();
+                        if(per=='('){
+                            break;
+                        }else{
+                            output = output + per;
+                        }
+                    }
                     break;
                 default:
-                    output = output + ch;
+                    output = output + in;
                     break;
             }
         }
         while(!stack.isEmpty()){
-            output = output + stack.pop();
+            output = output + ' ' + stack.pop();
         }
         System.out.println(output);
         calculate(output);
@@ -103,10 +120,8 @@ public class CalcEngine
 
     }
 
-    private void power(char ch) {
-    }
 
-    public void operator(char opThis, int prec1){
+    public void operator(char operatorThis, int prec1){
         while(!stack.isEmpty()){
             char topStack = stack.pop();
             if (topStack == '('){
@@ -125,21 +140,10 @@ public class CalcEngine
                 if(prec2 < prec1){
                     stack.push(topStack);
                     break;
-                }else output = output + topStack;
+                }else output = output + topStack + ' ';
             }
         }
-        stack.push(opThis);
-    }
-
-    public void priority(char ch){
-        while(!stack.isEmpty()){
-            char cha = stack.pop();
-            if (cha == '(')
-                break;
-            else {output = output + cha;
-                //stack.clear();
-            }
-        }
+        stack.push(operatorThis);
     }
 
     public void clear(){

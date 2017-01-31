@@ -54,9 +54,10 @@ public class UserInterface
 
         JPanel contentPane = (JPanel)frame.getContentPane();
         contentPane.setLayout(new BorderLayout(10, 10));
-        contentPane.setBackground(Color.darkGray);
-        contentPane.getFont().isBold();
         contentPane.setBorder(new EmptyBorder( 10, 10, 10, 10));
+
+        contentPane.setBackground(Color.darkGray);
+
 
         display = new JTextField();
         contentPane.add(display, BorderLayout.NORTH);
