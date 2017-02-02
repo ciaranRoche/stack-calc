@@ -58,6 +58,10 @@ public class UserInterface
 
         contentPane.setBackground(Color.darkGray);
 
+//        JPanel textPanel = new JPanel(new GridLayout(3,1));
+//        textPanel.add(display);
+//        textPanel.add(displayAns);
+//        contentPane.add(textPanel, BorderLayout.NORTH);
 
         display = new JTextField();
         contentPane.add(display, BorderLayout.NORTH);

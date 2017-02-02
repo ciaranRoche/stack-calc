@@ -1,4 +1,7 @@
 import java.util.Stack;
+import java.util.StringTokenizer;
+
+import static java.lang.Character.*;
 
 /**
  * The main part of the calculator doing the calculations.
@@ -11,11 +14,11 @@ import java.util.Stack;
 public class CalcEngine
 {
     public String output;
-    public Stack<Integer> memory;
+    public Stack<Double> memory;
     public Stack<Character>stack;
-  //public Stack<Character> postfix;
     public String ans;
-    int temp;
+    double temp;
+
     /**
      * Create a CalcEngine instance. Initialise its state so that it is ready
      * for use.
@@ -24,60 +27,58 @@ public class CalcEngine
     {
         stack = new Stack<>();
         memory = new Stack<>();
-       // postfix = new Stack<Character>();
         output = "";
         ans = "";
     }
 
+
     public void calculate(String output){
         memory.clear();
         ans = "";
-        for(int n=0; n<output.length(); n++){
-            int in = output.charAt(n);
-            if(('0'<=in && in<='9')||('.'==in)){
-                temp += in;
-            }
-            else if(' ' == in){
-                memory.push(temp-'0');
-                temp = 0;
-            }
-            else{
-                switch(in){
-                    case '+':
-                        int ba = memory.pop();
-                        int aa = memory.pop();
-                        memory.push(aa+ba);
-                        break;
-                    case '-':
-                        int bm = memory.pop();
-                        int am = memory.pop();
-                        memory.push(am-bm);
-                        break;
-                    case '*':
-                        int bmu = memory.pop();
-                        int amu = memory.pop();
-                        memory.push(amu*bmu);
-                        break;
-                    case '/':
-                        int bd = memory.pop();
-                        int ad = memory.pop();
-                        memory.push(ad/bd);
-                        break;
-                    case '^':
-                        int bp = memory.pop();
-                        int ap = memory.peek();
-                        memory.push((int) Math.pow(ap, bp));
-                        break;
+        double a;
+        double b;
+        String[] tokens = output.split(" ");
+        for(int i=0; i< tokens.length; i++){
+            String currentElement = tokens[i];
+            if( (!currentElement.equals("+")) && (!currentElement.equals("-"))
+                    && (!currentElement.equals("*")) && (!currentElement.equals("/"))
+                    && (!currentElement.equals("^"))) {
+                memory.push(Double.parseDouble(currentElement));
+            }else if (memory.size() >= 2){
+                if (currentElement.equals("+")){
+                    b = memory.pop();
+                    a = memory.pop();
+                    memory.push(a + b);
+                }
+                if (currentElement.equals("-")){
+                    b = memory.pop();
+                    a = memory.pop();
+                    memory.push(a - b);
+                }
+                if (currentElement.equals("*")){
+                    b = memory.pop();
+                    a = memory.pop();
+                    memory.push(a * b);
+                }
+                if (currentElement.equals("/")){
+                    b = memory.pop();
+                    a = memory.pop();
+                    memory.push(a / b);
+                }
+                if (currentElement.equals("^")){
+                    b = memory.pop();
+                    a = memory.pop();
+                    memory.push(Math.pow(a, b));
                 }
             }
-        }
-        ans = ans + memory.pop();
+        }ans = ans + memory.pop();
     }
+
 
     public String infixToPostfix(String s){
         for(int i = 0; i< s.length(); i++){
             char in = s.charAt(i);
-            if((!Character.isDigit(in)) && (in!='.')){
+            if((!isDigit(in)) && (in!='.') && (in!='(') && (in!=')')){
                 char filler = ' ';
                 output = output + filler;
             }
@@ -91,7 +92,31 @@ public class CalcEngine
                     operator(in, 2);
                     break;
                 case '^':
-                    operator(in, 3);
+                    while(!stack.isEmpty()){
+                        int prec1 = 3;
+                        char topStack = stack.pop();
+                        if (topStack == '('){
+                            stack.push(topStack);
+                            break;
+                        }else{
+                            int prec2;
+                            if(topStack == '+' || topStack == '-') {
+                                prec2 = 1;
+                            }else {
+                                prec2 = 2;
+                            }
+                             if(topStack == '*' || topStack == '/') {
+                                prec2 = 1;
+                            }else{
+                                prec2 = 2;
+                            }
+                            if(prec2 < prec1){
+                                stack.push(topStack);
+                                break;
+                            }else output = output + topStack + ' ';
+                        }
+                    }
+                    stack.push(in);
                     break;
                 case '(':
                     stack.push(in);
@@ -102,7 +127,7 @@ public class CalcEngine
                         if(per=='('){
                             break;
                         }else{
-                            output = output + per;
+                            output = output + " " + per;
                         }
                     }
                     break;
@@ -129,14 +154,11 @@ public class CalcEngine
                 break;
             }else{
                 int prec2;
-                if(topStack == '+' || topStack == '-')
+                if(topStack == '+' || topStack == '-') {
                     prec2 = 1;
-                else
+                }else {
                     prec2 = 2;
-                if(topStack == '*' || topStack == '/')
-                    prec2 = 1;
-                else
-                    prec2 = 2;
+                }
                 if(prec2 < prec1){
                     stack.push(topStack);
                     break;
@@ -182,3 +204,4 @@ public class CalcEngine
     }
 
 }
+
