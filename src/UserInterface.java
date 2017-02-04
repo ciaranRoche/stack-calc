@@ -21,7 +21,7 @@ public class UserInterface
     private String infix;
 
     private JFrame frame;
-    private JTextField display, displayAns;
+    private JTextField display, displayAns, displayPost;
     private JLabel status;
 
     /**
@@ -55,16 +55,18 @@ public class UserInterface
         JPanel contentPane = (JPanel)frame.getContentPane();
         contentPane.setLayout(new BorderLayout(10, 10));
         contentPane.setBorder(new EmptyBorder( 10, 10, 10, 10));
+        JPanel displayPanelText = new JPanel(new GridLayout(3, 1));
 
-        contentPane.setBackground(Color.darkGray);
-
-//        JPanel textPanel = new JPanel(new GridLayout(3,1));
-//        textPanel.add(display);
-//        textPanel.add(displayAns);
-//        contentPane.add(textPanel, BorderLayout.NORTH);
 
         display = new JTextField();
-        contentPane.add(display, BorderLayout.NORTH);
+        displayPanelText.add(display);
+        displayPost = new JTextField();
+        displayPanelText.add(displayPost);
+        displayAns = new JTextField();
+        displayPanelText.add(displayAns);
+
+
+        contentPane.add(displayPanelText, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel(new GridLayout(5, 4));
         addButton(buttonPanel, "C");
@@ -89,10 +91,8 @@ public class UserInterface
         addButton(buttonPanel, "=");
         contentPane.add(buttonPanel, BorderLayout.CENTER);
 
-//		status = new JLabel(calc.getAuthor());
-//		contentPane.add(status,BorderLayout.PAGE_END);
-        displayAns = new JTextField();
-        contentPane.add(displayAns, BorderLayout.SOUTH);
+		status = new JLabel(calc.getAuthor());
+		contentPane.add(status,BorderLayout.PAGE_END);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
@@ -140,6 +140,7 @@ public class UserInterface
         else if(command.equals("=")){
             calc.infixToPostfix(infix);
             ansDisplay();
+            postDisplay();
         }
         else if(command.equals("C"))
             infix = "";
@@ -153,11 +154,15 @@ public class UserInterface
      */
     private void redisplay()
     {
-        display.setText(infix);
+        display.setText("Input: " + infix);
+    }
+
+    private void postDisplay(){
+        displayPost.setText("Postfix: " + calc.postfix);
     }
 
     private void ansDisplay(){
-        displayAns.setText(calc.ans);
+        displayAns.setText("Answer: " + calc.ans);
     }
 
     /**

@@ -16,8 +16,7 @@ public class CalcEngine
     public String output;
     public Stack<Double> memory;
     public Stack<Character>stack;
-    public String ans;
-    double temp;
+    public String ans, postfix;
 
     /**
      * Create a CalcEngine instance. Initialise its state so that it is ready
@@ -29,8 +28,16 @@ public class CalcEngine
         memory = new Stack<>();
         output = "";
         ans = "";
+        postfix = "";
     }
 
+    /**
+     * Calculate method which takes in a string "prefix" which has white space delims
+     * add, to which the string gets split into tokens, these tokens then are evaluated
+     * if not operator are pushed to a stack, if operator, then stack is popped twice
+     * calculation is carried out and answer is pushed back on the stack.
+     * when no tokens are left the answer is returned from a final stack pop
+     */
 
     public void calculate(String output){
         memory.clear();
@@ -74,6 +81,15 @@ public class CalcEngine
         }ans = ans + memory.pop();
     }
 
+    /**
+     * Takes in a string to inserts white spaces around operators to make splitting the
+     * string easier,
+     * if not an operator item is added to the string, when operator white space is added
+     * priority is taken on operator, depending on outcome it is either pushed to a stack
+     * or sent to the output string
+     * @param s
+     * @return
+     */
 
     public String infixToPostfix(String s){
         for(int i = 0; i< s.length(); i++){
@@ -85,11 +101,11 @@ public class CalcEngine
             switch (in){
                 case '+':
                 case '-':
-                    operator(in, 1);
+                    operatorPriority(in, 1);
                     break;
                 case '*':
                 case '/':
-                    operator(in, 2);
+                    operatorPriority(in, 2);
                     break;
                 case '^':
                     while(!stack.isEmpty()){
@@ -99,18 +115,18 @@ public class CalcEngine
                             stack.push(topStack);
                             break;
                         }else{
-                            int prec2;
+                            int priority2;
                             if(topStack == '+' || topStack == '-') {
-                                prec2 = 1;
+                                priority2 = 1;
                             }else {
-                                prec2 = 2;
+                                priority2 = 2;
                             }
                              if(topStack == '*' || topStack == '/') {
-                                prec2 = 1;
+                                 priority2 = 1;
                             }else{
-                                prec2 = 2;
+                                 priority2 = 2;
                             }
-                            if(prec2 < prec1){
+                            if(priority2 < prec1){
                                 stack.push(topStack);
                                 break;
                             }else output = output + topStack + ' ';
@@ -139,27 +155,37 @@ public class CalcEngine
         while(!stack.isEmpty()){
             output = output + ' ' + stack.pop();
         }
-        System.out.println(output);
+        postfix = output;
+        System.out.println(postfix);
         calculate(output);
         return output;
 
     }
 
 
-    public void operator(char operatorThis, int prec1){
+    /**
+     * Messy method which calculates operator priority, takes in operator with
+     * a given priority rating, if stack is empty operator is pushed straight
+     * to the stack, other wise stack is popped, this is checked, and depending
+     * on what it is, a priority is given and priorities are checked, depending
+     * on result one operator gets pushed to stack other gets put on to the string
+     * @param operatorThis
+     * @param priority1
+     */
+    public void operatorPriority(char operatorThis, int priority1){
         while(!stack.isEmpty()){
             char topStack = stack.pop();
             if (topStack == '('){
                 stack.push(topStack);
                 break;
             }else{
-                int prec2;
+                int priority2;
                 if(topStack == '+' || topStack == '-') {
-                    prec2 = 1;
+                    priority2 = 1;
                 }else {
-                    prec2 = 2;
+                    priority2 = 2;
                 }
-                if(prec2 < prec1){
+                if(priority2 < priority1){
                     stack.push(topStack);
                     break;
                 }else output = output + topStack + ' ';
@@ -170,10 +196,7 @@ public class CalcEngine
 
     public void clear(){
         output = "";
-    }
-
-    public String getOutput(){
-        return output;
+        postfix = "";
     }
 
 
